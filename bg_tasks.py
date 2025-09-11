@@ -1,12 +1,25 @@
 from celery import Celery
 import yt_dlp
 import uuid
+import shutil
+import time 
 
 celery_app = Celery(
     "worker",
     broker="redis://localhost:6379/0",
     backend="redis://localhost:6379/0"
 )
+
+@celery_app.task
+def delay_task():
+    time.sleep(10)
+    print("Delayed Task")
+    return {"message": "10 Secs Later"}
+
+@celery_app.task
+def alert_server(task_id):
+    time.sleep(10)
+    return {"message": f"{task_id} - ready to download"}
 
 @celery_app.task
 def download_playlist(url: str):
@@ -23,9 +36,6 @@ def download_playlist(url: str):
             }],
     }
 
-    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-        ydl.download([url])
-
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             ydl.download([url])
@@ -41,4 +51,11 @@ def download_playlist(url: str):
             print(error_msg)
             return {"ERROR": "Something went wrong :("}
         
-    return {"success": "Playlists downloaded successfully"}
+    return folder_id
+
+
+@celery_app.task
+def delete_folder_10mins(folder_path: str, zip_path: str):
+    shutil.rmtree(folder_path)
+    shutil.os.remove(zip_path)
+    return {"folder": folder_path, "Deleted": True }
