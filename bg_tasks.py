@@ -22,9 +22,7 @@ def alert_server(task_id):
     return {"message": f"{task_id} - ready to download"}
 
 @celery_app.task
-def download_playlist(url: str):
-
-    folder_id = str(uuid.uuid4())
+def download_playlist(url: str, folder_id : str):
 
     ydl_opts = {
         "format": "bestaudio/best",

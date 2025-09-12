@@ -8,6 +8,7 @@ from bg_tasks import celery_app, download_playlist, delete_folder_10mins, delay_
 from dotenv import load_dotenv
 import os
 import shutil
+import uuid
 
 load_dotenv()
 
@@ -34,11 +35,6 @@ def read_root():
     return {"Hello": "Worlds Nigga"}
 
 
-@app.get("/items/{item_id}")
-def read_item(item_id: int, q: Union[str, None] = None):
-    return {"item_id": item_id, "q": q}
-
-
 @app.get("/status/{task_id}")
 def get_status(task_id: str):
     task_result = AsyncResult(task_id, app=celery_app)
@@ -46,7 +42,7 @@ def get_status(task_id: str):
     return {
         "task_id": task_id,
         "status": task_result.status,
-        "result": task_result.result if task_result.ready() else None
+        "result": {"download_status": True, "download_id":task_result.result} if task_result.ready() else {"download_status": False, "message": "Not Ready"}
     }
 
 @app.get("/delay")
@@ -85,7 +81,7 @@ async def get_playlist(item: Item, background_tasks: BackgroundTasks):
     # Validate Url
     # Check if private
     # Create Thread
-
-    task = download_playlist.apply_async(args=(item.name,), link=alert_server.s())
-    return {"task_id": task.id, "status": "submitted"}
+    folder_id = str(uuid.uuid4())
+    task = download_playlist.apply_async(args=(item.name, folder_id,), link=alert_server.s())
+    return {"task_id": task.id,"folder_id": folder_id,"status": "submitted"}
 
