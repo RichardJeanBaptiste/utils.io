@@ -4,7 +4,7 @@ from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from celery.result import AsyncResult
-from bg_tasks import celery_app, download_playlist, delete_folder_10mins, delay_task, alert_server
+from bg_tasks import celery_app, download_playlist, delete_folder_10mins, alert_server
 from dotenv import load_dotenv
 import os
 import shutil
@@ -45,13 +45,6 @@ def get_status(task_id: str):
         "result": {"download_status": True, "download_id":task_result.result} if task_result.ready() else {"download_status": False, "message": "Not Ready"}
     }
 
-@app.get("/delay")
-def delayed_route():
-    '''
-        Alert Server
-    '''
-    delay_task.apply_async(link=alert_server.s())
-    return {"message": "Server Alert"}
 
 
 @app.get("/get_dlp/{folder_id}")

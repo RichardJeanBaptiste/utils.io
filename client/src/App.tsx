@@ -1,5 +1,13 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { useState, useEffect } from 'react'
+import { Spinner } from 'react-bootstrap';
 import './App.css'
+
+/**
+ * Clear Selection
+ * Style The UI
+ */
+
 
 function App() {
 
@@ -7,13 +15,13 @@ function App() {
   const [taskId, setTaskId] = useState("");
   const [folderId, setFolderId] = useState("");
   const [checkDownload, setCheckDownload] = useState(false);
-  const [showDownloadLink, setShowDownloadLink] = useState("none");
+  const [showDownloadLink, setShowDownloadLink] = useState(false);
+  const [showSpinner, setShowSpinner] = useState(false);
 
   useEffect(() => {
     let intervalId: NodeJS.Timeout | null = null;
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
-
 
     // Check Download Status
     if (checkDownload) {
@@ -27,8 +35,9 @@ function App() {
         .then((data) => {
           console.log(data.result.download_status);
           if(data.result.download_status){
-            setShowDownloadLink("block")
+            setShowDownloadLink(true);
             setCheckDownload(false);
+            setShowSpinner(false);
           }
         })
       }, 10000);
@@ -44,7 +53,10 @@ function App() {
     setUrl(e.target.value);
   }
 
+  
+
   const handleSubmit = async () => {
+    setShowSpinner(true);
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json")
     await fetch('http://localhost:8000/dlp',{
@@ -61,14 +73,42 @@ function App() {
             })
   }
 
+  const resetPage = () => {
+      console.log("ABC");
+      // setUrl("");
+      // setTaskId("");
+      // setFolderId("");
+      // setCheckDownload(false);
+      // setShowSpinner(false);
+  }
+
+  const DownloadLink = () => {
+
+    if(!showDownloadLink) {
+      return (
+        <div>
+            <input name='url' placeholder='Playlist link' value={url} onChange={handleUrl}/>
+            <button onClick={handleSubmit}>Submit</button>
+        </div> 
+      )
+    } else if(showSpinner) {
+        return (
+            <Spinner animation="border" role="status">
+              <span className="visually-hidden">Loading...</span>
+            </Spinner>
+        )
+    } else {
+      return (
+              <a style={{display : "block" }} href={`http://localhost:8000/get_dlp/${folderId}`} onClick={resetPage}>Download Link</a>
+            )
+    }
+  }
+
   return (
     <div>
-      <p>{taskId}</p>
-      <p>Link - {`http://localhost:8000/get_dlp/${folderId}`}</p>
-      <a style={{display : showDownloadLink }} href={`http://localhost:8000/get_dlp/${folderId}`}>Download Link</a>
-      <label htmlFor='url'></label>
-      <input name='url' placeholder='Playlist link' value={url} onChange={handleUrl}/>
-      <button onClick={handleSubmit}>Submit</button>
+      <DownloadLink/>
+      <button onClick={() => console.log({showSpinner})}>Spinner State</button>
+
     </div>
   )
 }

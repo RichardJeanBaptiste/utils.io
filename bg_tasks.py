@@ -1,6 +1,5 @@
 from celery import Celery
 import yt_dlp
-import uuid
 import shutil
 import time 
 
@@ -9,12 +8,6 @@ celery_app = Celery(
     broker="redis://localhost:6379/0",
     backend="redis://localhost:6379/0"
 )
-
-@celery_app.task
-def delay_task():
-    time.sleep(10)
-    print("Delayed Task")
-    return {"message": "10 Secs Later"}
 
 @celery_app.task
 def alert_server(task_id):
@@ -54,6 +47,16 @@ def download_playlist(url: str, folder_id : str):
 
 @celery_app.task
 def delete_folder_10mins(folder_path: str, zip_path: str):
-    shutil.rmtree(folder_path)
-    shutil.os.remove(zip_path)
-    return {"folder": folder_path, "Deleted": True }
+
+    try:
+        shutil.rmtree(folder_path)
+        shutil.os.remove(zip_path)
+        return {"folder": folder_path, "Deleted": True }
+    except Exception as e:
+        if(isinstance(e, FileNotFoundError)):
+            return {"folder": folder_path, "Deleted": False, "Message": "File Not Found"}
+        else:
+            print(e)
+            return {"Message": "Something Went Wrong", "Error": str(e)}
+
+    
