@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { useState, useEffect } from 'react'
 import { Spinner } from 'react-bootstrap';
+import Test from './components/test';
 import './App.css'
 
 /**
@@ -109,6 +110,7 @@ function App() {
       <DownloadLink/>
       <button onClick={() => console.log({showSpinner})}>Spinner State</button>
 
+      <Test/>
     </div>
   )
 }
