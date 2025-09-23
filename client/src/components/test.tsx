@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { useState, useEffect } from "react";
 import { Spinner } from 'react-bootstrap';
 
@@ -9,7 +10,12 @@ const Test = () => {
     const startDownload = () => {
         setIsDownloading(false);
         setDownloadFinished(true);
-        
+    }
+
+    const stopDownload = () => {
+        setDownloadStart(false);
+        setDownloadFinished(false);
+        setIsDownloading(false);
     }
 
     if(isDownloading) {
@@ -21,7 +27,7 @@ const Test = () => {
     } else if(downloadFinished) {
         return (
             <div>
-                <p>Download Finished....</p>
+                <p onClick={stopDownload}>Download Finished....</p>
             </div>
         )
     } else {

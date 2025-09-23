@@ -75,42 +75,43 @@ function App() {
   }
 
   const resetPage = () => {
-      console.log("ABC");
-      // setUrl("");
-      // setTaskId("");
-      // setFolderId("");
-      // setCheckDownload(false);
-      // setShowSpinner(false);
+      console.log("Reset");
+      setUrl("");
+      setTaskId("");
+      setFolderId("");
+      setCheckDownload(false);
+      setShowSpinner(false);
+      setShowDownloadLink(false);
   }
 
   const DownloadLink = () => {
-
-    if(!showDownloadLink) {
+    if(showSpinner) {
       return (
-        <div>
-            <input name='url' placeholder='Playlist link' value={url} onChange={handleUrl}/>
-            <button onClick={handleSubmit}>Submit</button>
-        </div> 
+          <Spinner animation="border" role="status">
+            <span className="visually-hidden">Loading...</span>
+          </Spinner>
       )
-    } else if(showSpinner) {
+    } else if(showDownloadLink) {
         return (
-            <Spinner animation="border" role="status">
-              <span className="visually-hidden">Loading...</span>
-            </Spinner>
-        )
+            <div>
+                <a style={{display : "block" }} href={`http://localhost:8000/get_dlp/${folderId}`}>Download Link</a>
+              <button onClick={resetPage}>Download Again?</button>
+            </div>  
+          )
     } else {
-      return (
-              <a style={{display : "block" }} href={`http://localhost:8000/get_dlp/${folderId}`} onClick={resetPage}>Download Link</a>
-            )
+        return (
+          <div>
+              <input name='url' placeholder='Playlist link' value={url} onChange={handleUrl}/>
+              <button onClick={handleSubmit}>Submit</button>
+          </div> 
+        )
     }
   }
 
   return (
     <div>
       <DownloadLink/>
-      <button onClick={() => console.log({showSpinner})}>Spinner State</button>
-
-      <Test/>
+      <p>Test Link : https://www.youtube.com/playlist?list=PLPRWtKgY2MOuMQTifZgo3LWh51AWCImgA</p>
     </div>
   )
 }
