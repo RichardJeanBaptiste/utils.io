@@ -1,5 +1,5 @@
 import Form from 'react-bootstrap/Form';
-import Button from 'react-bootstrap/Button';
+import { Button } from 'react-bootstrap';
 import { FaGoogle } from "react-icons/fa";
 import { FaFacebook } from "react-icons/fa";
 import { FaGithub } from "react-icons/fa";
@@ -19,6 +19,11 @@ function HomePage() {
                         <Form.Label>Password:</Form.Label>
                         <Form.Control type="passwprd" placeholder='*************'/>
                     </Form.Group>
+
+                    <div style={{ display: 'flex', flexDirection: 'row', width: '100%', height: '10%'}}>
+                        <Button variant='link'>Forgot Password?</Button>
+                        <Button variant='link'>Login</Button>
+                    </div>
 
                     <div className='login_icons'>
                         <Button variant='light'>
