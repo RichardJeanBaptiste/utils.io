@@ -2,6 +2,7 @@ from typing import Union
 from fastapi import FastAPI, BackgroundTasks
 from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
+from routes import users
 from pydantic import BaseModel
 from celery.result import AsyncResult
 from bg_tasks import celery_app, download_playlist, delete_folder_10mins, alert_server
@@ -26,6 +27,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(users.router, prefix="/api")
+
 class Item(BaseModel):
     name: str
 
@@ -44,7 +47,6 @@ def get_status(task_id: str):
         "status": task_result.status,
         "result": {"download_status": True, "download_id":task_result.result} if task_result.ready() else {"download_status": False, "message": "Not Ready"}
     }
-
 
 
 @app.get("/get_dlp/{folder_id}")
